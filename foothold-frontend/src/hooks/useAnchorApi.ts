@@ -3,13 +3,22 @@ import type { GraphData, IngestResponse } from '../types';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api';
 
+// Shared headers to ensure every request bypasses Ngrok's HTML warning page
+const HEADERS = {
+  'Content-Type': 'application/json',
+  'ngrok-skip-browser-warning': 'true',
+};
+
 export const useAnchorApi = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchGraph = useCallback(async (): Promise<GraphData | null> => {
     try {
-      const res = await fetch(`${API_BASE}/graph`);
+      const res = await fetch(`${API_BASE}/graph`, {
+        method: 'GET',
+        headers: HEADERS,
+      });
       if (!res.ok) throw new Error('Failed to fetch graph data');
       return await res.json();
     } catch (err: any) {
@@ -24,8 +33,8 @@ export const useAnchorApi = () => {
     try {
       const res = await fetch(`${API_BASE}/ingest`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ raw_text: rawText, goal: goal }), // Added goal here
+        headers: HEADERS,
+        body: JSON.stringify({ raw_text: rawText, goal: goal }),
       });
       if (!res.ok) throw new Error('Ingestion failed');
       return await res.json();
@@ -42,7 +51,7 @@ export const useAnchorApi = () => {
     try {
       const res = await fetch(`${API_BASE}/confirm`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: HEADERS,
         body: JSON.stringify(draft),
       });
       if (!res.ok) throw new Error('Failed to commit draft');
@@ -61,6 +70,7 @@ export const useAnchorApi = () => {
     try {
       const res = await fetch(`${API_BASE}/graph`, {
         method: 'DELETE',
+        headers: HEADERS,
       });
       if (!res.ok) throw new Error('Failed to wipe graph');
       return true;
@@ -74,4 +84,3 @@ export const useAnchorApi = () => {
 
   return { fetchGraph, ingestNotes, confirmDraft, loading, error, wipeGraph };
 };
-
