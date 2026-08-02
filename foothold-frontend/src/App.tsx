@@ -25,9 +25,9 @@ export default function App() {
       <header className="bg-white/80 backdrop-blur-md border-b border-gray-200 px-6 py-3 flex items-center justify-between z-10">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold shadow-sm">
-            A
+            F
           </div>
-          <h1 className="text-xl font-bold tracking-tight text-slate-800">Anchor</h1>
+          <h1 className="text-xl font-bold tracking-tight text-slate-800">Foothold</h1>
         </div>
         <div className="text-xs font-medium bg-gray-100 text-gray-500 px-3 py-1.5 rounded-full border border-gray-200">
           {graphData.nodes.length} Nodes Indexed

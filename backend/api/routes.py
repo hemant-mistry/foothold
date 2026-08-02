@@ -15,7 +15,7 @@ async def ingest_notes(request: IngestRequest):
         existing_node_ids = {node["id"] for node in existing_nodes}
         
         # 2. Extract & Link
-        draft = extract_and_link(request.raw_text, existing_nodes)
+        draft = extract_and_link(request.raw_text, existing_nodes, request.goal)
         
         # 3. Validate
         verdict = validate_draft(draft)
@@ -61,3 +61,13 @@ async def confirm_concept(update: GraphUpdate):
 @router.get("/api/graph")
 async def fetch_graph():
     return database.get_graph_data()
+
+@router.delete("/api/graph")
+async def wipe_graph():
+    try:
+        database.wipe_db()
+        return {"status": "success", "message": "Graph wiped successfully"}
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))

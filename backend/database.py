@@ -64,3 +64,15 @@ def insert_edge(edge: EdgeRelationship):
             VALUES (?, ?, ?, ?)
         """, (edge.source_id, edge.target_id, edge.relationship, edge.reasoning))
         conn.commit()
+
+def wipe_db():
+    """Deletes all nodes and edges from the database."""
+    conn = get_db()
+    cursor = conn.cursor()
+    try:
+        # Wipe both tables (update table names if yours are different)
+        cursor.execute("DELETE FROM edges")
+        cursor.execute("DELETE FROM nodes")
+        conn.commit()
+    finally:
+        conn.close()

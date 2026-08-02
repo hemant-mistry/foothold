@@ -15,24 +15,27 @@ if not api_key:
 
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
-def extract_and_link(raw_text: str, existing_nodes: list) -> GraphUpdate:
-    context_str = "\n".join([f"- {n['name']} (ID: {n['id']}): {n['my_explanation']}" for n in existing_nodes])
+def extract_and_link(raw_text: str, existing_nodes: list, goal:str) -> GraphUpdate:
+    node_glossary = "\n".join([f"- [{n['id']}]: {n['name']}" for n in existing_nodes])
     
-    prompt = f"""
-    Current existing concepts in the user's graph:
-    {context_str}
+    system_prompt = f"""
+    You are a strict knowledge graph extraction system.
     
-    Task: 
-    1. Extract core Machine Learning concepts from the 'New Input'.
-    2. Analyze relationships between new concepts and existing concepts.
-    3. Output a structured JSON containing nodes and connecting edges.
+    USER GOAL: "{goal}"
     
-    New Input: {raw_text}
+    EXISTING GRAPH NODES:
+    {node_glossary if node_glossary else "(The graph is currently empty)"}
+    
+    INSTRUCTIONS:
+    1. EXTRACT: Identify concepts and relationships in the provided text that strictly serve the USER GOAL. Ignore off-topic trivia.
+    2. REUSE: If a concept in the text matches an concept in the EXISTING GRAPH NODES, you MUST use its existing [node_id] as the source_id or target_id in your edges.
+    3. CREATE: If a concept is genuinely new and relevant to the goal, generate a new unique ID for it.
+    4. VALIDATE: Ensure every relation explicitly traces back to the source text. Do not hallucinate connections.
     """
     
     response = client.models.generate_content(
         model='gemini-3.5-flash',
-        contents=prompt,
+        contents=system_prompt,
         config=types.GenerateContentConfig(
             response_mime_type="application/json",
             response_schema=GraphUpdate,

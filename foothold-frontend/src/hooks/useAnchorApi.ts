@@ -18,14 +18,14 @@ export const useAnchorApi = () => {
     }
   }, []);
 
-  const ingestNotes = async (rawText: string): Promise<IngestResponse | null> => {
+  const ingestNotes = async (rawText: string, goal: string): Promise<IngestResponse | null> => {
     setLoading(true);
     setError(null);
     try {
       const res = await fetch(`${API_BASE}/ingest`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ raw_text: rawText }),
+        body: JSON.stringify({ raw_text: rawText, goal: goal }), // Added goal here
       });
       if (!res.ok) throw new Error('Ingestion failed');
       return await res.json();
@@ -54,6 +54,24 @@ export const useAnchorApi = () => {
       setLoading(false);
     }
   };
+  
+  const wipeGraph = async (): Promise<boolean> => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`${API_BASE}/graph`, {
+        method: 'DELETE',
+      });
+      if (!res.ok) throw new Error('Failed to wipe graph');
+      return true;
+    } catch (err: any) {
+      setError(err.message);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  return { fetchGraph, ingestNotes, confirmDraft, loading, error };
+  return { fetchGraph, ingestNotes, confirmDraft, loading, error, wipeGraph };
 };
+

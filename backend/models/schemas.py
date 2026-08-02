@@ -34,6 +34,10 @@ class GraphUpdate(BaseModel):
 
 class IngestRequest(BaseModel):
     raw_text: str
+    goal: str = Field(
+        default="Extract all fundamental concepts and their relationships.",
+        description="User-defined goal to steer extraction and validation"
+    )
 
 class IngestResponse(BaseModel):
     draft: GraphUpdate
