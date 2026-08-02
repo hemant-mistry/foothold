@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
-import type { GraphData, ConceptNode, EdgeRelationship } from '../types';
+import type { GraphData, ConceptNode } from '../types';
 
 interface GraphCanvasProps {
   data: GraphData;
@@ -122,14 +122,12 @@ export default function GraphCanvas({ data }: GraphCanvasProps) {
       // Position edge label along the curve
       edgeLabels
         .attr('x', (d: any) => {
-          const dx = d.target.x - d.source.x;
           const dy = d.target.y - d.source.y;
           // Offset slightly from center to account for curve
           return (d.source.x + d.target.x) / 2 + (dy * 0.15); 
         })
         .attr('y', (d: any) => {
           const dx = d.target.x - d.source.x;
-          const dy = d.target.y - d.source.y;
           return (d.source.y + d.target.y) / 2 - (dx * 0.15);
         });
 
@@ -145,10 +143,10 @@ export default function GraphCanvas({ data }: GraphCanvasProps) {
       d.fx = event.x;
       d.fy = event.y;
     }
-    function dragended(event: any, d: any) {
+    function dragended(event: any, _d: any) {
       if (!event.active) simulation.alphaTarget(0);
     }
-    function dblclicked(event: any, d: any) {
+    function dblclicked(_event: any, d: any) {
       d.fx = null;
       d.fy = null;
       simulation.alphaTarget(0.3).restart();
