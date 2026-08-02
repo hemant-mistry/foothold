@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import type { GraphData, IngestResponse } from '../types';
 
-const API_BASE = 'http://localhost:8000/api';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api';
 
 export const useAnchorApi = () => {
   const [loading, setLoading] = useState(false);
